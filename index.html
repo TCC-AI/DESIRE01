@@ -489,7 +489,7 @@ function updatePoints(desire, element) {
             
             // 實際應用中的代碼 (取消註釋使用)
             /*
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbwtepM15uRgR6SGrBqHENY3pZXSxyCLq-pRhMlt6qSKkll6x2w3jgqz4Ug0VYZwSWmn/exec';
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbzi6i1kymOQlALSoZ_5hxbfRynMY0wAcCRNkgCDHwApzQ_2GCVnXwAUtPnnm4zLi9-M/exec';
             
             fetch(scriptURL, {
                 method: 'POST',
@@ -560,81 +560,6 @@ function updatePoints(desire, element) {
             messageDiv.textContent = '';
             messageDiv.className = 'message';
         }
-
-        // 全局變數，用於存儲慾望和點數數據
-let desireData = {};
-
-// 從Google Sheets獲取慾望清單
-function fetchDesireList() {
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwtepM15uRgR6SGrBqHENY3pZXSxyCLq-pRhMlt6qSKkll6x2w3jgqz4Ug0VYZwSWmn/exec';
-    
-    showLoadingMessage();
-    
-    fetch(scriptURL + '?action=getDesireList')
-        .then(response => response.json())
-        .then(data => {
-            console.log("API返回數據:", data); // 調試用
-            desireData = data; // 儲存數據供後續使用
-            populateDesireDropdown(data);
-        })
-        .catch(error => {
-            console.error('Error fetching desire list:', error);
-            document.getElementById('message').textContent = '載入數據失敗，請重試';
-            document.getElementById('message').className = 'message error';
-            hideLoadingMessage();
-        });
-}
-
-// 填充慾望下拉選單
-function populateDesireDropdown(data) {
-    const desireSelect = document.getElementById('desire');
-    
-    // 清空現有選項
-    desireSelect.innerHTML = '<option value="" disabled selected>請選擇慾望項目</option>';
-    
-    // 填充選項
-    if (data && data.desires && Array.isArray(data.desires)) {
-        data.desires.forEach(desire => {
-            const option = document.createElement('option');
-            option.value = desire;
-            option.textContent = desire;
-            desireSelect.appendChild(option);
-        });
-        
-        // 添加事件監聽器，當選擇變更時更新點數
-        desireSelect.addEventListener('change', updatePoints);
-    }
-    
-    hideLoadingMessage();
-}
-
-// 更新點數顯示
-function updatePoints() {
-    const desireSelect = document.getElementById('desire');
-    const selectedDesire = desireSelect.value;
-    const pointsDisplay = document.getElementById('points');
-    
-    if (selectedDesire && desireData.points) {
-        // 查找對應的點數
-        const pointKey = `${selectedDesire}`;
-        const points = desireData.points[pointKey] || 0;
-        
-        // 更新點數顯示
-        pointsDisplay.value = points;
-    } else {
-        pointsDisplay.value = '';
-    }
-}
-
-// 頁面加載時獲取數據
-document.addEventListener('DOMContentLoaded', function() {
-    fetchDesireList();
-});
-<div class="form-group">
-    <label for="points">獲得點數</label>
-    <input type="text" id="points" name="points" readonly>
-</div>
-
     </script>
 </body>
 </html>
