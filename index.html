@@ -318,43 +318,30 @@
             });
         });
 
-        // 從Google Sheets獲取慾望清單
-        function fetchDesireList() {
-            // 在實際應用中，這裡會調用Google Apps Script Web App
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbzi6i1kymOQlALSoZ_5hxbfRynMY0wAcCRNkgCDHwApzQ_2GCVnXwAUtPnnm4zLi9-M/exec';
-            
-            // 顯示加載訊息
-            showLoadingMessage();
-            
-            // 實際應用中取消註釋下面的代碼
-            /*
-            fetch(scriptURL)
-                .then(response => response.json())
-                .then(data => {
-                    processDesireData(data);
-                })
-                .catch(error => {
-                    console.error('Error fetching desire list:', error);
-                    document.getElementById('message').textContent = '載入數據失敗，請重試';
-                    document.getElementById('message').className = 'message error';
-                });
-            */
-            
-            // 模擬數據加載延遲 (實際使用時可刪除此部分)
-            setTimeout(() => {
-                // 這裡將被實際API響應替換
-                const mockData = {
-                    desires: [
-                        {desire: "旅遊", elements: [{name: "國內旅遊", points: 5}, {name: "國外旅遊", points: 10}]},
-                        {desire: "美食", elements: [{name: "家常菜", points: 2}, {name: "餐廳", points: 5}, {name: "高級餐廳", points: 8}]},
-                        {desire: "娛樂", elements: [{name: "電影", points: 3}, {name: "音樂會", points: 6}, {name: "展覽", points: 4}]}
-                    ]
-                };
-                processDesireData(mockData);
-            }, 1000);
-        }
+// 從Google Sheets獲取慾望清單
+function fetchDesireList() {
+    // Google Apps Script Web App URL
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzi6i1kymOQlALSoZ_5hxbfRynMY0wAcCRNkgCDHwApzQ_2GCVnXwAUtPnnm4zLi9-M/exec';
+    
+    // 顯示加載訊息
+    showLoadingMessage();
+    
+    // 實際調用API
+    fetch(scriptURL + '?action=getDesireList')
+        .then(response => response.json())
+        .then(data => {
+            console.log("API返回數據:", data); // 調試用
+            processDesireData(data);
+        })
+        .catch(error => {
+            console.error('Error fetching desire list:', error);
+            document.getElementById('message').textContent = '載入數據失敗，請重試';
+            document.getElementById('message').className = 'message error';
+            hideLoadingMessage();
+        });
+}
 
-  // 處理慾望數據
+        
 // 處理慾望數據
 function processDesireData(data) {
     const desireSelect = document.getElementById('desire');
