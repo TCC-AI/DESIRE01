@@ -469,26 +469,29 @@
             // 實際應用中的代碼
             const scriptURL = 'https://script.google.com/macros/s/AKfycbw81joxjfQsIN1cARRpwIOGx4Q2zg_YFhvWZW2akM-WbNGprUd7ZLTiqswit7zy6aXX/exec';
             
-            fetch(scriptURL, {
-                method: 'POST',
-                body: JSON.stringify(data),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.success) {
-                    showSuccessMessage();
-                    resetForm();
-                } else {
-                    showErrorMessage(result.message || '提交失敗');
-                }
-            })
-            .catch(error => {
-                console.error('Error submitting data:', error);
-                showErrorMessage('網路錯誤，請重試');
-            });
+            // 在 fetch 請求中加入必要的 headers
+fetch(scriptURL, {
+    method: 'POST',
+    mode: 'cors', // 加入這行
+    headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json' // 加入這行
+    },
+    body: JSON.stringify(data)
+})
+            .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(result => {
+        // ...
+    })
+    .catch(error => {
+        console.error('具體錯誤:', error); // 詳細記錄錯誤
+        showErrorMessage(`提交失敗: ${error.message}`);
+    });
         }
 
         // 重置表單
