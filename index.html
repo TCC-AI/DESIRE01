@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <img src="1.jpg" alt="Logo" class="app-logo">
     <title>慾望管理大師</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -221,6 +222,34 @@
                 width: calc(100% - 40px);
                 margin: 20px auto;
             }
+            .app-logo {
+    width: 80px; /* 可依照實際需求調整大小 */
+    height: auto;
+    display: block;
+    margin: 0 auto 15px;
+    border-radius: 10px; /* 可選：添加圓角 */
+}
+
+/* 調整 app-header 的 padding */
+.app-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    color: white;
+    padding: 20px 20px 50px; /* 調整上方 padding 以配合 logo */
+    position: relative;
+    overflow: hidden;
+}
+
+/* 響應式調整 */
+@media (max-width: 480px) {
+    .app-logo {
+        width: 60px; /* 手機版縮小 logo */
+    }
+    
+    .app-header {
+        padding: 16px 16px 40px;
+    }
+}
+
         }
     </style>
 </head>
