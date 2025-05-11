@@ -318,106 +318,61 @@
             });
         });
 
-// 從Google Sheets獲取慾望清單
-function fetchDesireList() {
-    // Google Apps Script Web App URL
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzi6i1kymOQlALSoZ_5hxbfRynMY0wAcCRNkgCDHwApzQ_2GCVnXwAUtPnnm4zLi9-M/exec';
-    
-    // 顯示加載訊息
-    showLoadingMessage();
-    
-    // 實際調用API
-    fetch(scriptURL + '?action=getDesireList')
-        .then(response => response.json())
-        .then(data => {
-            console.log("API返回數據:", data); // 調試用
-            processDesireData(data);
-        })
-        .catch(error => {
-            console.error('Error fetching desire list:', error);
-            document.getElementById('message').textContent = '載入數據失敗，請重試';
-            document.getElementById('message').className = 'message error';
-            hideLoadingMessage();
-        });
-}
-
-        
-// 處理慾望數據
-function processDesireData(data) {
-    const desireSelect = document.getElementById('desire');
-    
-    // 清空現有選項
-    desireSelect.innerHTML = '<option value="" disabled selected>請選擇慾望項目</option>';
-    
-    // 確保數據是陣列形式
-    if (data && data.desires && Array.isArray(data.desires)) {
-        // 填充慾望下拉選單
-        data.desires.forEach(desire => {
-            // 確保 desire 是字串
-            const desireValue = typeof desire === 'string' ? desire : 
-                               (desire.name || desire.value || desire.toString());
+        // 從Google Sheets獲取慾望清單
+        function fetchDesireList() {
+            // Google Apps Script Web App URL
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbyfdk67oSdRLXEHE69IVvDVcPmvfQBAtNIcZ8zExwdkLqwP48TZ1dW4Xf5RrFpX2Xc/exec';
             
-            const option = document.createElement('option');
-            option.value = desireValue;
-            option.textContent = desireValue;
-            desireSelect.appendChild(option);
-        });
+            // 顯示加載訊息
+            showLoadingMessage();
+            
+            // 實際調用API
+            fetch(scriptURL + '?action=getDesireList')
+                .then(response => response.json())
+                .then(data => {
+                    console.log("API返回數據:", data); // 調試用
+                    processDesireData(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching desire list:', error);
+                    document.getElementById('message').textContent = '載入數據失敗，請重試';
+                    document.getElementById('message').className = 'message error';
+                    hideLoadingMessage();
+                });
+        }
         
-        // 儲存元素和點數數據
-        elementData = data.elements || {};
-        pointsData = data.points || {};
-    } else {
-        // 顯示錯誤訊息
-        showMessage('數據格式錯誤，請聯繫管理員', 'error');
-        console.error('Invalid data format:', data);
-    }
-    
-    hideLoadingMessage();
-}
-
-
-// 更新要素下拉選單
-function updateElementOptions(selectedDesire) {
-    const elementSelect = document.getElementById('element');
-    
-    // 清空現有選項
-    elementSelect.innerHTML = '';
-    
-    if (!selectedDesire) {
-        const defaultOption = document.createElement('option');
-        defaultOption.value = '';
-        defaultOption.disabled = true;
-        defaultOption.selected = true;
-        defaultOption.textContent = '請先選擇慾望項目';
-        elementSelect.appendChild(defaultOption);
-        return;
-    }
-    
-    // 添加預設選項
-    const defaultOption = document.createElement('option');
-    defaultOption.value = '';
-    defaultOption.disabled = true;
-    defaultOption.selected = true;
-    defaultOption.textContent = '請選擇要素';
-    elementSelect.appendChild(defaultOption);
-    
-    // 填充要素選項 (與所選慾望相關聯的C欄位值)
-    const elements = elementData[selectedDesire] || [];
-    elements.forEach(element => {
-        const option = document.createElement('option');
-        option.value = element;
-        option.textContent = element;
-        elementSelect.appendChild(option);
-    });
-}
-
-// 更新點數顯示
-function updatePoints(desire, element) {
-    const pointsInput = document.getElementById('points');
-    const key = `${desire}-${element}`;
-    pointsInput.value = pointsData[key] || '';
-}
-
+        // 處理慾望數據
+        function processDesireData(data) {
+            const desireSelect = document.getElementById('desire');
+            
+            // 清空現有選項
+            desireSelect.innerHTML = '<option value="" disabled selected>請選擇慾望項目</option>';
+            
+            // 確保數據是陣列形式
+            if (data && data.desires && Array.isArray(data.desires)) {
+                // 填充慾望下拉選單
+                data.desires.forEach(desire => {
+                    // 確保 desire 是字串
+                    const desireValue = typeof desire === 'string' ? desire : 
+                                    (desire.name || desire.value || desire.toString());
+                    
+                    const option = document.createElement('option');
+                    option.value = desireValue;
+                    option.textContent = desireValue;
+                    desireSelect.appendChild(option);
+                });
+                
+                // 儲存元素和點數數據
+                elementData = data.elements || {};
+                pointsData = data.points || {};
+            } else {
+                // 顯示錯誤訊息
+                showMessage('數據格式錯誤，請聯繫管理員', 'error');
+                console.error('Invalid data format:', data);
+            }
+            
+            hideLoadingMessage();
+        }
 
         // 更新要素下拉選單
         function updateElementOptions(selectedDesire) {
@@ -487,9 +442,8 @@ function updatePoints(desire, element) {
                 points: points
             };
             
-            // 實際應用中的代碼 (取消註釋使用)
-            /*
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbzi6i1kymOQlALSoZ_5hxbfRynMY0wAcCRNkgCDHwApzQ_2GCVnXwAUtPnnm4zLi9-M/exec';
+            // 實際應用中的代碼
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbyfdk67oSdRLXEHE69IVvDVcPmvfQBAtNIcZ8zExwdkLqwP48TZ1dW4Xf5RrFpX2Xc/exec';
             
             fetch(scriptURL, {
                 method: 'POST',
@@ -511,13 +465,6 @@ function updatePoints(desire, element) {
                 console.error('Error submitting data:', error);
                 showErrorMessage('網路錯誤，請重試');
             });
-            */
-            
-            // 模擬提交 (實際使用時可刪除此部分)
-            setTimeout(() => {
-                showSuccessMessage();
-                resetForm();
-            }, 1500);
         }
 
         // 重置表單
@@ -559,6 +506,13 @@ function updatePoints(desire, element) {
             const messageDiv = document.getElementById('message');
             messageDiv.textContent = '';
             messageDiv.className = 'message';
+        }
+
+        // 顯示訊息
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = message;
+            messageDiv.className = `message ${type || ''}`;
         }
     </script>
 </body>
