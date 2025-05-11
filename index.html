@@ -322,7 +322,7 @@
         // 從Google Sheets獲取慾望清單
         function fetchDesireList() {
             // Google Apps Script Web App URL
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbxOCRNHOAoWtUutYsqqeVfCLRs7aLZA6BIu7dA6lcEfn2DbY8fTpaoa8EmuF5oN3aiw/exec';
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbyJDhLO2ltxa0Y-asQ3BaMKerXwl4MJxT79MHin3idF77KCh3zcKdY1VZH034J4lMoq/exec';
             
             // 顯示加載訊息
             showLoadingMessage();
@@ -440,56 +440,48 @@
             pointsInput.value = points;
         }
 
-        // 提交數據
-        function submitData() {
-            const desire = document.getElementById('desire').value;
-            const element = document.getElementById('element').value;
-            const points = document.getElementById('points').value;
-            const messageDiv = document.getElementById('message');
-            
-            // 驗證
-            if (!desire || !element || !points) {
-                messageDiv.textContent = '請填寫所有欄位';
-                messageDiv.className = 'message error';
-                return;
-            }
-            
-            // 顯示加載訊息
-            messageDiv.textContent = '正在提交...';
-            messageDiv.className = 'message';
-            
-            // 準備提交的數據
-            const data = {
-                action: 'submitData',
-                desire: desire,
-                element: element,
-                points: points
-            };
-            
-            // 實際應用中的代碼
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbxOCRNHOAoWtUutYsqqeVfCLRs7aLZA6BIu7dA6lcEfn2DbY8fTpaoa8EmuF5oN3aiw/exec';
-            
-            fetch(scriptURL, {
-                method: 'POST',
-                body: JSON.stringify(data),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.success) {
-                    showSuccessMessage();
-                    resetForm();
-                } else {
-                    showErrorMessage(result.message || '提交失敗');
-                }
-            })
-            .catch(error => {
-                console.error('Error submitting data:', error);
-                showErrorMessage('網路錯誤，請重試');
-            });
-        }
+// 只需要替換原本 script 標籤裡的 submitData 函數
+function submitData() {
+    const desire = document.getElementById('desire').value;
+    const element = document.getElementById('element').value;
+    const points = document.getElementById('points').value;
+    const messageDiv = document.getElementById('message');
+    
+    // 驗證
+    if (!desire || !element || !points) {
+        messageDiv.textContent = '請填寫所有欄位';
+        messageDiv.className = 'message error';
+        return;
+    }
+    
+    // 顯示加載訊息
+    messageDiv.textContent = '正在提交...';
+    messageDiv.className = 'message';
+    
+    // 準備 FormData
+    const formData = new FormData();
+    formData.append('慾望', desire);
+    formData.append('要素', element);
+    formData.append('點數', points);
+
+    // 實際應用中的代碼
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyJDhLO2ltxa0Y-asQ3BaMKerXwl4MJxT79MHin3idF77KCh3zcKdY1VZH034J4lMoq/exec';
+    
+    fetch(scriptURL, {
+        method: 'POST',
+        mode: 'no-cors', // 添加這行
+        body: formData
+    })
+    .then(response => {
+        showSuccessMessage();
+        resetForm();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showErrorMessage('網路錯誤，請重試');
+    });
+}
+
 
         // 重置表單
         function resetForm() {
