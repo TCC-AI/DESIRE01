@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>慾望管理大師</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <style>
         :root {
             --primary-color: #1a73e8;
@@ -199,6 +200,38 @@
         .message.error {
             color: #d93025;
         }
+        
+        /* 頁面切換相關樣式 */
+        .page {
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        /* 次要按鈕樣式 */
+        .btn-secondary {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #f1f3f4;
+            color: var(--primary-color);
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .btn-secondary:hover {
+            background: #e8eaed;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* 圖表容器樣式 */
+        .chart-container {
+            padding: 10px 20px 30px;
+            overflow: hidden;
+        }
 
         @media (max-width: 480px) {
             .app-card {
@@ -222,61 +255,63 @@
                 margin: 20px auto;
             }
             .app-logo {
-    width: 100px; /* 可依照實際需求調整大小 */
-    height: auto;
-    display: block;
-    margin: 0 auto 15px;
-    border-radius: 100px; /* 可選：添加圓角 */
-}
+                width: 100px;
+                height: auto;
+                display: block;
+                margin: 0 auto 15px;
+                border-radius: 100px;
+            }
 
-/* 調整 app-header 的 padding */
-.app-header {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-    color: white;
-    padding: 20px 20px 50px; /* 調整上方 padding 以配合 logo */
-    position: relative;
-    overflow: hidden;
-}
+            .app-header {
+                background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+                color: white;
+                padding: 20px 20px 50px;
+                position: relative;
+                overflow: hidden;
+            }
 
-/* 響應式調整 */
-@media (max-width: 480px) {
-    .app-logo {
-        width: 150px; /* 手機版縮小 logo */
-    }
-    
-    .app-header {
-        padding: 16px 16px 40px;
-    }
-}
-            /* 修正圖片位置 */
-.header-image {
-    position: absolute;
-    top: 0;  /* 調整到頂部 */
-    left: 50%;  /* 水平置中 */
-    transform: translateX(-50%);  /* 確保完全置中 */
-    width: 100%;  /* 設定寬度 */
-    max-width: 500px;  /* 最大寬度限制 */
-    z-index: 1;  /* 確保圖片在適當層級 */
-}
+            @media (max-width: 480px) {
+                .app-logo {
+                    width: 150px;
+                }
+                
+                .app-header {
+                    padding: 16px 16px 40px;
+                }
+            }
+            
+            .header-image {
+                position: absolute;
+                top: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 100%;
+                max-width: 500px;
+                z-index: 1;
+            }
 
-/* 確保標題位置正確 */
-.title {
-    position: relative;
-    z-index: 2;  /* 確保標題在圖片上方 */
-    margin-top: [適當的間距];  /* 根據實際需求調整 */
-}
-
-
+            .title {
+                position: relative;
+                z-index: 2;
+                margin-top: 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="mainPage">
         <div class="app-card">
             <div class="app-header">
                 <img src="1.jpg" alt="Logo" class="app-logo">
                 <h1>慾望管理大師</h1>
                 <div class="wave"></div>
+            </div>
+            
+            <!-- 進度表按鈕 -->
+            <div class="form-group" style="text-align: center; padding-bottom: 0;">
+                <button id="progressBtn" class="btn-secondary">
+                    <span>進度表</span>
+                </button>
             </div>
             
             <div class="form-group">
@@ -309,6 +344,26 @@
         </div>
     </div>
     
+    <!-- 進度表頁面 -->
+    <div id="progressPage" class="page" style="display: none; max-width: 480px; width: 100%;">
+        <div class="app-card">
+            <div class="app-header">
+                <h1>進度表</h1>
+                <div class="wave"></div>
+            </div>
+            
+            <div class="form-group" style="text-align: center; padding-bottom: 0;">
+                <button id="backBtn" class="btn-secondary">
+                    <span>返回前頁</span>
+                </button>
+            </div>
+            
+            <div class="chart-container">
+                <div id="chart_div" style="width: 100%; height: 400px;"></div>
+            </div>
+        </div>
+    </div>
+    
     <script>
         // 全局變數
         let desireData = [];
@@ -324,6 +379,10 @@
             const pointsInput = document.getElementById('points');
             const submitBtn = document.getElementById('submitBtn');
             const messageDiv = document.getElementById('message');
+            const progressBtn = document.getElementById('progressBtn');
+            const backBtn = document.getElementById('backBtn');
+            const mainPage = document.getElementById('mainPage');
+            const progressPage = document.getElementById('progressPage');
             
             // 載入慾望清單數據
             fetchDesireList();
@@ -364,12 +423,28 @@
                 ripple.style.left = `${x}px`;
                 ripple.style.top = `${y}px`;
             });
+            
+            // 進度表按鈕點擊事件
+            progressBtn.addEventListener('click', function() {
+                mainPage.style.display = 'none';
+                progressPage.style.display = 'block';
+                loadProgressChart();
+            });
+
+            // 返回按鈕點擊事件
+            backBtn.addEventListener('click', function() {
+                progressPage.style.display = 'none';
+                mainPage.style.display = 'block';
+            });
+            
+            // 載入 Google Charts
+            google.charts.load('current', {'packages':['corechart', 'bar']});
         });
 
         // 從Google Sheets獲取慾望清單
         function fetchDesireList() {
             // Google Apps Script Web App URL
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbyJDhLO2ltxa0Y-asQ3BaMKerXwl4MJxT79MHin3idF77KCh3zcKdY1VZH034J4lMoq/exec';
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbz0j41bsj8agCqV0izUTLBSJhe8lDbullepSwW3Lnb0d2NG92UMpzR-X-OKFo8pm5JE/exec';
             
             // 顯示加載訊息
             showLoadingMessage();
@@ -487,48 +562,117 @@
             pointsInput.value = points;
         }
 
-// 只需要替換原本 script 標籤裡的 submitData 函數
-function submitData() {
-    const desire = document.getElementById('desire').value;
-    const element = document.getElementById('element').value;
-    const points = document.getElementById('points').value;
-    const messageDiv = document.getElementById('message');
-    
-    // 驗證
-    if (!desire || !element || !points) {
-        messageDiv.textContent = '請填寫所有欄位';
-        messageDiv.className = 'message error';
-        return;
-    }
-    
-    // 顯示加載訊息
-    messageDiv.textContent = '正在提交...';
-    messageDiv.className = 'message';
-    
-    // 準備 FormData
-    const formData = new FormData();
-    formData.append('慾望', desire);
-    formData.append('要素', element);
-    formData.append('點數', points);
+        // 提交數據
+        function submitData() {
+            const desire = document.getElementById('desire').value;
+            const element = document.getElementById('element').value;
+            const points = document.getElementById('points').value;
+            const messageDiv = document.getElementById('message');
+            
+            // 驗證
+            if (!desire || !element || !points) {
+                messageDiv.textContent = '請填寫所有欄位';
+                messageDiv.className = 'message error';
+                return;
+            }
+            
+            // 顯示加載訊息
+            messageDiv.textContent = '正在提交...';
+            messageDiv.className = 'message';
+            
+            // 準備 FormData
+            const formData = new FormData();
+            formData.append('慾望', desire);
+            formData.append('要素', element);
+            formData.append('點數', points);
 
-    // 實際應用中的代碼
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyJDhLO2ltxa0Y-asQ3BaMKerXwl4MJxT79MHin3idF77KCh3zcKdY1VZH034J4lMoq/exec';
-    
-    fetch(scriptURL, {
-        method: 'POST',
-        mode: 'no-cors', // 添加這行
-        body: formData
-    })
-    .then(response => {
-        showSuccessMessage();
-        resetForm();
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showErrorMessage('網路錯誤，請重試');
-    });
-}
+            // 實際應用中的代碼
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbyJDhLO2ltxa0Y-asQ3BaMKerXwl4MJxT79MHin3idF77KCh3zcKdY1VZH034J4lMoq/exec';
+            
+            fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors', // 添加這行
+                body: formData
+            })
+            .then(response => {
+                showSuccessMessage();
+                resetForm();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showErrorMessage('網路錯誤，請重試');
+            });
+        }
 
+                // 載入進度圖表
+        function loadProgressChart() {
+            showMessage('載入進度表...', '');
+            
+            // 調用 Google Apps Script 獲取進度數據
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbz0j41bsj8agCqV0izUTLBSJhe8lDbullepSwW3Lnb0d2NG92UMpzR-X-OKFo8pm5JE/exec';
+            
+            fetch(scriptURL + '?action=getProgressData')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showMessage('載入進度表失敗: ' + data.message, 'error');
+                        return;
+                    }
+                    
+                    // 繪製圖表
+                    google.charts.setOnLoadCallback(function() {
+                        drawProgressChart(data.progressData);
+                    });
+                    
+                    showMessage('', '');
+                })
+                .catch(error => {
+                    console.error('Error loading progress data:', error);
+                    showMessage('載入進度表失敗，請重試', 'error');
+                });
+        }
+
+        // 繪製進度圖表
+        function drawProgressChart(progressData) {
+            // 準備圖表數據
+            const dataTable = new google.visualization.DataTable();
+            dataTable.addColumn('string', '項目');
+            dataTable.addColumn('number', '進度 (%)');
+            
+            // 添加數據行
+            progressData.forEach(item => {
+                dataTable.addRow([item.title, item.progress]);
+            });
+            
+            // 設置圖表選項
+            const options = {
+                title: '慾望達成進度',
+                titleTextStyle: {
+                    fontSize: 18,
+                    bold: true,
+                    color: '#202124'
+                },
+                bars: 'horizontal',
+                height: 400,
+                colors: ['#4285f4'],
+                legend: { position: 'none' },
+                hAxis: {
+                    title: '進度百分比 (%)',
+                    minValue: 0,
+                    maxValue: 100,
+                    format: '#\'%\''
+                },
+                animation: {
+                    startup: true,
+                    duration: 1000,
+                    easing: 'out'
+                }
+            };
+            
+            // 創建並繪製圖表
+            const chart = new google.visualization.BarChart(document.getElementById('chart_div'));
+            chart.draw(dataTable, options);
+        }
 
         // 重置表單
         function resetForm() {
