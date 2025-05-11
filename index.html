@@ -354,37 +354,73 @@
             }, 1000);
         }
 
-        // 處理慾望數據
-        function processDesireData(data) {
-            const desireSelect = document.getElementById('desire');
-            
-            // 清空現有選項
-            desireSelect.innerHTML = '<option value="" disabled selected>請選擇慾望項目</option>';
-            
-            // 處理數據並填充下拉選單
-            desireData = data.desires.map(item => item.desire);
-            
-            // 填充慾望下拉選單
-            desireData.forEach(desire => {
-                const option = document.createElement('option');
-                option.value = desire;
-                option.textContent = desire;
-                desireSelect.appendChild(option);
-            });
-            
-            // 建立要素和點數映射
-            data.desires.forEach(item => {
-                elementData[item.desire] = item.elements.map(el => el.name);
-                
-                // 建立慾望+要素到點數的映射
-                item.elements.forEach(el => {
-                    const key = `${item.desire}-${el.name}`;
-                    pointsData[key] = el.points;
-                });
-            });
-            
-            hideLoadingMessage();
-        }
+  // 處理慾望數據
+function processDesireData(data) {
+    const desireSelect = document.getElementById('desire');
+    
+    // 清空現有選項
+    desireSelect.innerHTML = '<option value="" disabled selected>請選擇慾望項目</option>';
+    
+    // 處理數據並填充下拉選單
+    desireData = data.desires;
+    
+    // 填充慾望下拉選單 (不重複的A欄位值)
+    desireData.forEach(desire => {
+        const option = document.createElement('option');
+        option.value = desire;
+        option.textContent = desire;
+        desireSelect.appendChild(option);
+    });
+    
+    // 建立要素和點數映射
+    elementData = data.elements;
+    pointsData = data.points;
+    
+    hideLoadingMessage();
+}
+
+// 更新要素下拉選單
+function updateElementOptions(selectedDesire) {
+    const elementSelect = document.getElementById('element');
+    
+    // 清空現有選項
+    elementSelect.innerHTML = '';
+    
+    if (!selectedDesire) {
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        defaultOption.textContent = '請先選擇慾望項目';
+        elementSelect.appendChild(defaultOption);
+        return;
+    }
+    
+    // 添加預設選項
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.disabled = true;
+    defaultOption.selected = true;
+    defaultOption.textContent = '請選擇要素';
+    elementSelect.appendChild(defaultOption);
+    
+    // 填充要素選項 (與所選慾望相關聯的C欄位值)
+    const elements = elementData[selectedDesire] || [];
+    elements.forEach(element => {
+        const option = document.createElement('option');
+        option.value = element;
+        option.textContent = element;
+        elementSelect.appendChild(option);
+    });
+}
+
+// 更新點數顯示
+function updatePoints(desire, element) {
+    const pointsInput = document.getElementById('points');
+    const key = `${desire}-${element}`;
+    pointsInput.value = pointsData[key] || '';
+}
+
 
         // 更新要素下拉選單
         function updateElementOptions(selectedDesire) {
@@ -456,7 +492,7 @@
             
             // 實際應用中的代碼 (取消註釋使用)
             /*
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbz6atZtTDUSjYzQRTXScE6lOwE-98Aq8raK2VX7Yx2P-wdjFXO0c5DCqdtWVi_9_tPC/exec';
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbxqNiahpFVNQFIx8xk8CvqhN0cEqGCzYkWXUdtecGESpbxCWZsL7xeCBtwZDdGepbKz/exec';
             
             fetch(scriptURL, {
                 method: 'POST',
