@@ -267,6 +267,7 @@
         let desireData = [];
         let elementData = {};
         let pointsData = {};
+        let rawSheetData = []; // 儲存原始工作表數據
 
         // 初始化應用
         document.addEventListener('DOMContentLoaded', function() {
@@ -321,7 +322,7 @@
         // 從Google Sheets獲取慾望清單
         function fetchDesireList() {
             // Google Apps Script Web App URL
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbyfdk67oSdRLXEHE69IVvDVcPmvfQBAtNIcZ8zExwdkLqwP48TZ1dW4Xf5RrFpX2Xc/exec';
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbxOCRNHOAoWtUutYsqqeVfCLRs7aLZA6BIu7dA6lcEfn2DbY8fTpaoa8EmuF5oN3aiw/exec';
             
             // 顯示加載訊息
             showLoadingMessage();
@@ -331,6 +332,7 @@
                 .then(response => response.json())
                 .then(data => {
                     console.log("API返回數據:", data); // 調試用
+                    rawSheetData = data.rawData || []; // 保存原始數據
                     processDesireData(data);
                 })
                 .catch(error => {
@@ -364,7 +366,7 @@
                 
                 // 儲存元素和點數數據
                 elementData = data.elements || {};
-                pointsData = data.points || {};
+                pointsData = data.elementPoints || {}; // 使用更明確的名稱
             } else {
                 // 顯示錯誤訊息
                 showMessage('數據格式錯誤，請聯繫管理員', 'error');
@@ -410,10 +412,32 @@
         }
 
         // 更新點數顯示
-        function updatePoints(desire, element) {
+        function updatePoints(selectedDesire, selectedElement) {
             const pointsInput = document.getElementById('points');
-            const key = `${desire}-${element}`;
-            pointsInput.value = pointsData[key] || '';
+            
+            // 如果沒有選擇慾望或要素，清空點數
+            if (!selectedDesire || !selectedElement) {
+                pointsInput.value = '';
+                return;
+            }
+            
+            // 查找匹配的點數
+            let points = '';
+            
+            // 直接從原始數據中查找匹配的行
+            if (rawSheetData && Array.isArray(rawSheetData)) {
+                for (let i = 0; i < rawSheetData.length; i++) {
+                    const row = rawSheetData[i];
+                    // 檢查慾望(A欄)和要素(C欄)是否匹配
+                    if (row[0] === selectedDesire && row[2] === selectedElement) {
+                        points = row[3]; // D欄的點數值
+                        break;
+                    }
+                }
+            }
+            
+            // 設置點數值
+            pointsInput.value = points;
         }
 
         // 提交數據
@@ -443,7 +467,7 @@
             };
             
             // 實際應用中的代碼
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbyfdk67oSdRLXEHE69IVvDVcPmvfQBAtNIcZ8zExwdkLqwP48TZ1dW4Xf5RrFpX2Xc/exec';
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbxOCRNHOAoWtUutYsqqeVfCLRs7aLZA6BIu7dA6lcEfn2DbY8fTpaoa8EmuF5oN3aiw/exec';
             
             fetch(scriptURL, {
                 method: 'POST',
