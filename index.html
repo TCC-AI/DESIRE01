@@ -355,29 +355,39 @@
         }
 
   // 處理慾望數據
+// 處理慾望數據
 function processDesireData(data) {
     const desireSelect = document.getElementById('desire');
     
     // 清空現有選項
     desireSelect.innerHTML = '<option value="" disabled selected>請選擇慾望項目</option>';
     
-    // 處理數據並填充下拉選單
-    desireData = data.desires;
-    
-    // 填充慾望下拉選單 (不重複的A欄位值)
-    desireData.forEach(desire => {
-        const option = document.createElement('option');
-        option.value = desire;
-        option.textContent = desire;
-        desireSelect.appendChild(option);
-    });
-    
-    // 建立要素和點數映射
-    elementData = data.elements;
-    pointsData = data.points;
+    // 確保數據是陣列形式
+    if (data && data.desires && Array.isArray(data.desires)) {
+        // 填充慾望下拉選單
+        data.desires.forEach(desire => {
+            // 確保 desire 是字串
+            const desireValue = typeof desire === 'string' ? desire : 
+                               (desire.name || desire.value || desire.toString());
+            
+            const option = document.createElement('option');
+            option.value = desireValue;
+            option.textContent = desireValue;
+            desireSelect.appendChild(option);
+        });
+        
+        // 儲存元素和點數數據
+        elementData = data.elements || {};
+        pointsData = data.points || {};
+    } else {
+        // 顯示錯誤訊息
+        showMessage('數據格式錯誤，請聯繫管理員', 'error');
+        console.error('Invalid data format:', data);
+    }
     
     hideLoadingMessage();
 }
+
 
 // 更新要素下拉選單
 function updateElementOptions(selectedDesire) {
@@ -492,7 +502,7 @@ function updatePoints(desire, element) {
             
             // 實際應用中的代碼 (取消註釋使用)
             /*
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbzeqB49X4Ik3IIbUKqSqn2iEO7wQ_gFSyPzJarE2UTvNqFW-q_BwGkwczyw7XIieLc1/exec';
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbzi6i1kymOQlALSoZ_5hxbfRynMY0wAcCRNkgCDHwApzQ_2GCVnXwAUtPnnm4zLi9-M/exec';
             
             fetch(scriptURL, {
                 method: 'POST',
