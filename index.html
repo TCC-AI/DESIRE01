@@ -444,7 +444,7 @@
         // 從Google Sheets獲取慾望清單
         function fetchDesireList() {
             // Google Apps Script Web App URL
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbz0j41bsj8agCqV0izUTLBSJhe8lDbullepSwW3Lnb0d2NG92UMpzR-X-OKFo8pm5JE/exec';
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbytlnQMyomjM4r6wuCGYXNWm4GUGv5vHhurYLf6DlPb7re0DxX_lvYOQO8VLLoQXg54/exec';
             
             // 顯示加載訊息
             showLoadingMessage();
@@ -587,7 +587,7 @@
             formData.append('點數', points);
 
             // 實際應用中的代碼
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbyJDhLO2ltxa0Y-asQ3BaMKerXwl4MJxT79MHin3idF77KCh3zcKdY1VZH034J4lMoq/exec';
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbytlnQMyomjM4r6wuCGYXNWm4GUGv5vHhurYLf6DlPb7re0DxX_lvYOQO8VLLoQXg54/exec';
             
             fetch(scriptURL, {
                 method: 'POST',
@@ -632,47 +632,60 @@
                 });
         }
 
-        // 繪製進度圖表
-        function drawProgressChart(progressData) {
-            // 準備圖表數據
-            const dataTable = new google.visualization.DataTable();
-            dataTable.addColumn('string', '項目');
-            dataTable.addColumn('number', '進度 (%)');
-            
-            // 添加數據行
-            progressData.forEach(item => {
-                dataTable.addRow([item.title, item.progress]);
-            });
-            
-            // 設置圖表選項
-            const options = {
-                title: '慾望達成進度',
-                titleTextStyle: {
-                    fontSize: 18,
-                    bold: true,
-                    color: '#202124'
-                },
-                bars: 'horizontal',
-                height: 400,
-                colors: ['#4285f4'],
-                legend: { position: 'none' },
-                hAxis: {
-                    title: '進度百分比 (%)',
-                    minValue: 0,
-                    maxValue: 100,
-                    format: '#\'%\''
-                },
-                animation: {
-                    startup: true,
-                    duration: 1000,
-                    easing: 'out'
-                }
-            };
-            
-            // 創建並繪製圖表
-            const chart = new google.visualization.BarChart(document.getElementById('chart_div'));
-            chart.draw(dataTable, options);
+// 繪製進度圖表
+function drawProgressChart(progressData) {
+    // 確保有數據
+    if (!progressData || progressData.length === 0) {
+        document.getElementById('chart_div').innerHTML = '<p style="text-align:center;padding:20px;">沒有可顯示的進度數據</p>';
+        return;
+    }
+    
+    console.log("繪製圖表數據:", progressData); // 調試用
+    
+    // 準備圖表數據
+    const dataTable = new google.visualization.DataTable();
+    dataTable.addColumn('string', '項目');
+    dataTable.addColumn('number', '進度 (%)');
+    
+    // 添加數據行
+    progressData.forEach(item => {
+        // 確保進度值是數字
+        const progress = parseFloat(item.progress) || 0;
+        console.log(`添加項目: ${item.title}, 進度: ${progress}%`); // 調試用
+        dataTable.addRow([item.title, progress]);
+    });
+    
+    // 設置圖表選項
+    const options = {
+        title: '慾望達成進度',
+        titleTextStyle: {
+            fontSize: 18,
+            bold: true,
+            color: '#202124'
+        },
+        bars: 'horizontal',
+        height: 400,
+        colors: ['#4285f4'],
+        legend: { position: 'none' },
+        hAxis: {
+            title: '進度百分比 (%)',
+            minValue: 0,
+            maxValue: 100,
+            format: '#\'%\'',
+            gridlines: {count: 5}
+        },
+        animation: {
+            startup: true,
+            duration: 1000,
+            easing: 'out'
         }
+    };
+    
+    // 創建並繪製圖表
+    const chart = new google.visualization.BarChart(document.getElementById('chart_div'));
+    chart.draw(dataTable, options);
+}
+
 
         // 重置表單
         function resetForm() {
