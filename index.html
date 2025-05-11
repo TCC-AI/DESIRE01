@@ -249,6 +249,24 @@
         padding: 16px 16px 40px;
     }
 }
+            /* 修正圖片位置 */
+.header-image {
+    position: absolute;
+    top: 0;  /* 調整到頂部 */
+    left: 50%;  /* 水平置中 */
+    transform: translateX(-50%);  /* 確保完全置中 */
+    width: 100%;  /* 設定寬度 */
+    max-width: 500px;  /* 最大寬度限制 */
+    z-index: 1;  /* 確保圖片在適當層級 */
+}
+
+/* 確保標題位置正確 */
+.title {
+    position: relative;
+    z-index: 2;  /* 確保標題在圖片上方 */
+    margin-top: [適當的間距];  /* 根據實際需求調整 */
+}
+
 
         }
     </style>
